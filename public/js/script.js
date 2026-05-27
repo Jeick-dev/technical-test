@@ -75,6 +75,41 @@ async function saveSearchHistory(searchTerm) {
     };
   }
 
+async function loadSearchHistory() {
+  try {
+    const response = await fetch("./backend/search-history/get_history.php");
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    displaySearchHistory(data.history);
+  } catch (error) {
+    console.error("Error loading search history:", error);
+  }
+}
+
+function displaySearchHistory(history) {
+  const container = document.getElementById("history-container");
+  container.innerHTML = "<h2>Search History</h2>";
+
+  if (history.length === 0) {
+    container.innerHTML += '<p class="no-history">No search history found.</p>';
+    return;
+  }
+
+  const list = document.createElement("ul");
+  list.className = "history-list";
+
+  history.forEach((entry) => {
+    const item = document.createElement("li");
+    item.className = "history-item";
+    item.textContent = `${entry.search_term} (searched on ${new Date(entry.searched_at).toLocaleString()})`;
+    list.appendChild(item);
+  });
+
+  container.appendChild(list);
+}
+
 async function handleSearch() {
   const input = document.getElementById("search-input");
   const searchTerm = input.value.trim();
@@ -110,4 +145,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }, 200);
 
   searchInput.addEventListener("input", optimizedSearch);
+
+  loadSearchHistory();
 });
