@@ -2,7 +2,6 @@
 
 session_start();
 
-if (isset($_SESSION["session_id"]) && $_SESSION["session_id"]) {
     header("Content-type: application/json; charset=UTF-8");
     header("Access-Control-Allow-Origin: *");
     header("Access-Control-Allow-Methods: GET");
@@ -19,9 +18,10 @@ if (isset($_SESSION["session_id"]) && $_SESSION["session_id"]) {
     try {
         $database = new Database();
         $conn = $database->getConnection();
+        $currentSessionId = session_id();
 
-        $stmt = $conn->prepare("SELECT id, search_term, created_at FROM search_history WHERE session_id = :session_id ORDER BY created_at DESC");
-        $stmt->bindParam(":session_id", $_SESSION['session_id'], PDO::PARAM_STR);
+        $stmt = $conn->prepare("SELECT id, search_term, searched_at FROM search_history WHERE session_id = :session_id ORDER BY searched_at DESC");
+        $stmt->bindParam(":session_id", $currentSessionId, PDO::PARAM_STR);
         $stmt->execute();
 
         $history = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -35,7 +35,3 @@ if (isset($_SESSION["session_id"]) && $_SESSION["session_id"]) {
         http_response_code(500);
         echo json_encode(["error" => "Failed to retrieve search history: " . $e->getMessage()]);
     }
-} else {
-    http_response_code(401);
-    echo json_encode(["error" => "Unauthorized"]);
-}
