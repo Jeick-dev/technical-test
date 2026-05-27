@@ -1,7 +1,7 @@
 const API_URL = "https://en.wikipedia.org/w/api.php";
 
-// Function to search Wikipedia using the API
 async function searchWikipedia(searchTerm) {
+  // origin=* es necesario para evitar problemas de CORS con la API pública de Wikipedia
   const params = new URLSearchParams({
     action: "query",
     list: "search",

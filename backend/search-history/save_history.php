@@ -18,11 +18,26 @@ if ($_SERVER["REQUEST_METHOD"] != "POST") {
 $input = json_decode(file_get_contents("php://input"), true);
 $searchTerm = isset($input["search_term"]) ? trim($input["search_term"]) : null;
 
+function validateSearchTerm($term)
+{
+    if (strlen($term) > 500) {
+        return false;
+    }
+    return true;
+}
+
 if (empty($searchTerm)) {
     http_response_code(400);
     echo json_encode(["error" => "Search term is required"]);
     exit();
 }
+
+if (!validateSearchTerm($searchTerm)) {
+    http_response_code(400);
+    echo json_encode(["error" => "Invalid search term"]);
+    exit();
+}
+
 
 try {
     $database = new Database();
