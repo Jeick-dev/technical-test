@@ -20,7 +20,6 @@ Pequeña aplicación web (SPA) que permite buscar términos en la API de Wikiped
 En la raíz del proyecto, ejecutad el siguiente comando para levantar el contenedor de la base de datos:
 ```
 docker compose up -d
-
 ```
 
 *Nota: El contenedor ejecutará automáticamente el script ubicado en `/backend/scripts/create-table.sql` para inicializar la tabla necesaria.*
@@ -30,8 +29,7 @@ docker compose up -d
 Para ejecutar la aplicación localmente, inicia el servidor embebido de PHP apuntando a la raíz del proyecto:
 
 ```
-php -S localhost:8000
-
+php -S localhost:800
 ```
 
 
@@ -41,8 +39,10 @@ php -S localhost:8000
 
 * **Optimización y Rendimiento (Debounce):** En el frontend he implementado un mecanismo de *Debounce* (200ms) al capturar el evento de entrada del usuario (`input`). Para limitar, las peticiones, de esta forma, no se hace una petición por cada letra, evitando saturar la API pública de Wikipedia con peticiones innecesarias.
 
-* **Seguridad en el Cliente (Mitigación XSS):** Para la renderización de los títulos y los elementos del historial, se manipula el DOM de forma segura utilizando la propiedad `textContent` en lugar de `innerHTML`. De esta manera, se sanitizan los datos recibidos y se inmuniza la aplicación contra vulnerabilidades de Cross-Site Scripting (XSS).
+* **Seguridad en el Cliente (Mitigación XSS):** Para la renderización de los títulos y los elementos del historial, se manipula el DOM de forma segura utilizando la propiedad `textContent` en lugar de `innerHTML` (La unica excepción es el snippet de la wikipedia que al traer ya etiquetas HTML debo hacer un innerHTML). De esta manera, se sanitizan los datos recibidos y se inmuniza la aplicación contra vulnerabilidades de Cross-Site Scripting (XSS).
 
 * **Historial sin Autenticación:** He implementado el uso de `session_id()` de PHP para identificar de forma unívoca el navegador del usuario. De este modo, el historial es persistente y privado para cada usuario sin obligarle a registrarse.
 
 * **Separación de Responsabilidades:** El Frontend actúa como una SPA pura comunicándose de forma asíncrona mediante `fetch` con los endpoints de PHP (`save_history.php` y `get_history.php`), manteniendo desacoplada la lógica de persistencia de la interfaz de usuario.
+
+* **Validación de inputs** En el `save_history.php` implemente un validador de longitud para que no se pudiera hacer un ataque de saturación a la API con un input inconmesurable.
